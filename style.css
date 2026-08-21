@@ -1,6 +1,6 @@
 /* ==========================================================================
    أعمال الدهانات والديكورات بالرياض - Master Luxury Mobile-First CSS
-   Optimized for +98 Mobile UX | 2-Col Mobile Gallery | Zero CLS & Overlap
+   Optimized for +98 Mobile UX | 2-Col Mobile Gallery | Centered Footer
    ========================================================================== */
 
 /* 1. المتغيرات العامة ونظام الألوان */
@@ -331,7 +331,6 @@ button, input, select, textarea {
   line-height: 1;
 }
 
-/* تحسين تجربة الهيدر للشاشات الصغيرة جداً والوسط */
 @media (max-width: 991px) {
   .nav-desktop {
     display: none;
@@ -363,7 +362,7 @@ button, input, select, textarea {
     font-size: 0.8rem;
   }
   .btn-header-call span:nth-child(2) {
-    display: none; /* إخفاء رقم الجوال المطول ليبقى زر "اتصل الآن 📞" مرتب وأنيق */
+    display: none;
   }
 }
 
@@ -372,7 +371,7 @@ button, input, select, textarea {
     font-size: 0.82rem;
   }
   .logo-sub {
-    display: none; /* إخفاء السلوجان في الشاشات شديدة الصغر لمنع أي كسر في السطر */
+    display: none;
   }
   .btn-header-call {
     padding: 0.4rem 0.6rem;
@@ -763,18 +762,17 @@ button, input, select, textarea {
   opacity: 1;
 }
 
-/* ضبط المعرض ليكون صورتين متجاورتين تماماً بالجوال */
 @media (max-width: 768px) {
   .gallery-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 0.65rem !important;
   }
   .gallery-item {
-    aspect-ratio: 1 / 1 !important; /* شكل مربع فاخر على الجوال */
+    aspect-ratio: 1 / 1 !important;
     border-radius: var(--radius-sm);
   }
   .gallery-overlay {
-    opacity: 1; /* إبقاء التسمية واضحة ومقروءة على لمس الجوال */
+    opacity: 1;
     font-size: 0.72rem;
     padding: 0.75rem 0.35rem 0.35rem;
     line-height: 1.3;
@@ -1030,24 +1028,36 @@ button, input, select, textarea {
   color: #ffffff;
 }
 
+/* ضبط وتوسيط حقوق الموقع والمطور في منتصف الشاشة */
 .footer-bottom {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 1.25rem;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  font-size: 0.85rem;
+  text-align: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.developer-credit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-top: 0.2rem;
 }
 
 .developer-credit a {
   color: #38bdf8;
   font-weight: 700;
+  transition: var(--transition);
 }
 
 .developer-credit a:hover {
   text-decoration: underline;
+  color: #7dd3fc;
 }
 
 /* 14. أزرار التواصل العائمة المحقونة برمجياً */
