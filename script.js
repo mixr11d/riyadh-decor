@@ -1,38 +1,70 @@
 /**
  * أعمال الدهانات والديكورات بالرياض - Master JavaScript
- * Vanilla JS | CRO Optimized | Smart WhatsApp Lead Form | Auto Injected CTAs
+ * Vanilla JS | CRO Optimized | Google Ads Conversion Tracking Ready
  */
 
 (function () {
   'use strict';
 
-  // 1. ثوابت وبيانات المشروع
+  // =========================================================================
+  // 1. إعدادات تتبع إحالات قوقل (Google Ads Tracking Configuration)
+  // ضع هنا معرف الإعلان واللابل الخاص بكل إجراء من حسابك في قوقل إعلانات
+  // =========================================================================
+  const GOOGLE_ADS_CONFIG = {
+    CONVERSION_ID: 'AW-18403659658', // 👈 ضع هنا معرف إعلانات قوقل (مثال: AW-123456789)
+    LABELS: {
+      CALL: 'emj2CPPe8-UcEIqfxsdE',     // 👈 ضع هنا لابل تحويل الاتصال الهاتفي
+      WHATSAPP: 'q9vlCPbe8-UcEIqfxsdE',   // 👈 ضع هنا لابل تحويل نقرات الواتساب
+      FORM: 'IEKICLmm6OUcEIqfxsdE'      // 👈 ضع هنا لابل تحويل إرسال النموذج الذكي
+    }
+  };
+
+  // بيانات الهواتف
   const CLIENT_PHONE = '0576305985';
   const CLIENT_PHONE_INTL = '966576305985';
   const DEVELOPER_PHONE = '0578539687';
   const DEVELOPER_PHONE_INTL = '966578539687';
 
-  // 2. دالة تتبع التحويل الآمن للإعلانات (Google Ads & Analytics Tracking)
-  function trackConversion(actionName, label) {
+  // =========================================================================
+  // 2. دالة تتبع التحويل الذكية لإعلانات قوقل وفيسبوك
+  // =========================================================================
+  function trackConversion(type, eventLabel) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', 'conversion', {
-          'event_category': 'Engagement',
-          'event_action': actionName,
-          'event_label': label || 'Client Contact'
+        let label = '';
+        if (type === 'call') label = GOOGLE_ADS_CONFIG.LABELS.CALL;
+        if (type === 'whatsapp') label = GOOGLE_ADS_CONFIG.LABELS.WHATSAPP;
+        if (type === 'form') label = GOOGLE_ADS_CONFIG.LABELS.FORM;
+
+        // التحقق من وجود المعرف واللابل وإرسال الإحالة مباشرة لقوقل إعلانات
+        if (GOOGLE_ADS_CONFIG.CONVERSION_ID && label && !label.includes('AbCdEfGhIjK')) {
+          gtag('event', 'conversion', {
+            'send_to': `${GOOGLE_ADS_CONFIG.CONVERSION_ID}/${label}`,
+            'value': 1.0,
+            'currency': 'SAR'
+          });
+        }
+
+        // إرسال حدث موازي لـ Google Analytics 4
+        gtag('event', `${type}_conversion`, {
+          'event_category': 'Leads',
+          'event_label': eventLabel || type
         });
       }
+
+      // دعم فيسبوك بكسل إذا كان مفعلاً
       if (typeof fbq === 'function') {
-        fbq('track', 'Contact');
+        fbq('track', type === 'form' ? 'Lead' : 'Contact');
       }
     } catch (e) {
-      console.warn('Tracking script error bypassed:', e);
+      console.warn('Tracking script bypassed:', e);
     }
   }
 
-  // 3. حقن أزرار الاتصال والواتساب العائمة تلقائياً في جميع الصفحات
+  // =========================================================================
+  // 3. حقن أزرار الاتصال والواتساب العائمة تلقائياً
+  // =========================================================================
   function injectFloatingActionButtons() {
-    // حاوية الزرين أسفل اليمين
     const floatingRight = document.createElement('div');
     floatingRight.className = 'floating-actions-right';
     floatingRight.setAttribute('aria-label', 'أزرار التواصل السريع');
@@ -50,7 +82,7 @@
       </svg>
     `;
     waLink.addEventListener('click', function () {
-      trackConversion('WhatsApp_Click', 'Floating_WhatsApp');
+      trackConversion('whatsapp', 'Floating_WhatsApp');
     });
 
     // زر الاتصال الهاتفي العائم
@@ -64,14 +96,14 @@
       </svg>
     `;
     callLink.addEventListener('click', function () {
-      trackConversion('Call_Click', 'Floating_Call');
+      trackConversion('call', 'Floating_Call');
     });
 
     floatingRight.appendChild(waLink);
     floatingRight.appendChild(callLink);
     document.body.appendChild(floatingRight);
 
-    // زر الصعود للأعلى أسفل اليسار
+    // زر الصعود للأعلى
     const scrollTopBtn = document.createElement('button');
     scrollTopBtn.className = 'scroll-top-btn';
     scrollTopBtn.setAttribute('aria-label', 'الرجوع للأعلى');
@@ -95,7 +127,9 @@
     });
   }
 
-  // 4. إدارة القائمة الجانبية للجوال وقوائم الأكورديون
+  // =========================================================================
+  // 4. إدارة القائمة الجانبية للجوال
+  // =========================================================================
   function initMobileMenu() {
     const menuToggle = document.getElementById('menuToggle');
     const mobileSidebar = document.getElementById('mobileSidebar');
@@ -127,7 +161,9 @@
     }
   }
 
-  // 5. إدارة نموذج الحجز الذكي وتحويله إلى واتساب مع التتبع
+  // =========================================================================
+  // 5. إدارة النموذج الذكي وإرسال تحويل Form Submission
+  // =========================================================================
   function initSmartForms() {
     const quoteForms = document.querySelectorAll('.smart-lead-form');
 
@@ -147,10 +183,10 @@
         const district = districtInput ? districtInput.value.trim() : 'الرياض';
         const details = detailsInput ? detailsInput.value.trim() : 'لا توجد تفاصيل إضافية';
 
-        // إرسال حدث التحويل لجوجل
-        trackConversion('Form_Submission', `Lead_${service}`);
+        // 🎯 إرسال تحويل النموذج إلى قوقل إعلانات
+        trackConversion('form', `Lead_${service}`);
 
-        // تجهيز نص رسالة الواتساب المهيأة
+        // تجهيز نص رسالة الواتساب
         const whatsappMsg = 
           `*طلب معاينة وعرض سعر جديد*\n` +
           `-------------------------------\n` +
@@ -164,20 +200,21 @@
 
         const finalUrl = `https://wa.me/${CLIENT_PHONE_INTL}?text=${encodeURIComponent(whatsappMsg)}`;
 
-        // فتح الواتساب مباشرة
         window.open(finalUrl, '_blank');
         form.reset();
       });
     });
   }
 
-  // 6. استثناء روابط المطور من التتبع الإعلاني والتأكد من تتبع باقي الروابط
+  // =========================================================================
+  // 6. تتبع جميع روابط الموقع واستثناء روابط المطور
+  // =========================================================================
   function sanitizeTrackingLinks() {
     const allLinks = document.querySelectorAll('a');
     allLinks.forEach(function (link) {
       const href = link.getAttribute('href') || '';
       
-      // إذا كان الرابط يخص المطور، نمنع التتبع
+      // استثناء روابط المطور
       if (href.includes(DEVELOPER_PHONE) || href.includes(DEVELOPER_PHONE_INTL)) {
         link.addEventListener('click', function (e) {
           e.stopPropagation();
@@ -185,23 +222,25 @@
         return;
       }
 
-      // إذا كان اتصال عادي بالعميل
+      // تتبع نقرات الاتصال في الموقع (الهيدر، الفوتر، المحتوى)
       if (href.startsWith(`tel:${CLIENT_PHONE}`)) {
         link.addEventListener('click', function () {
-          trackConversion('Call_Click', 'Header_Or_Body_Call');
+          trackConversion('call', 'Body_Call_Click');
         });
       }
 
-      // إذا كان رابط واتساب خاص بالعميل
+      // تتبع نقرات الواتساب في الموقع
       if (href.includes(`wa.me/${CLIENT_PHONE_INTL}`) || href.includes(`phone=${CLIENT_PHONE_INTL}`)) {
         link.addEventListener('click', function () {
-          trackConversion('WhatsApp_Click', 'Body_WhatsApp');
+          trackConversion('whatsapp', 'Body_WhatsApp_Click');
         });
       }
     });
   }
 
+  // =========================================================================
   // 7. إدارة الأكورديون للأسئلة الشائعة
+  // =========================================================================
   function initFaqAccordion() {
     const faqItems = document.querySelectorAll('.faq-item');
     faqItems.forEach(function (item) {
@@ -218,7 +257,7 @@
     });
   }
 
-  // تهيئة النظام عند اكتمال تحميل DOM
+  // تشغيل كل شيء عند اكتمال تحميل الصفحة
   document.addEventListener('DOMContentLoaded', function () {
     injectFloatingActionButtons();
     initMobileMenu();
