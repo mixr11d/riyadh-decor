@@ -1,6 +1,6 @@
 /**
  * أعمال الدهانات والديكورات بالرياض - Master JavaScript (Auto Tracking Engine)
- * قياس الإحالات الشامل تلقائياً لجميع الصفحات واستثناء المطور
+ * نسخة مصححة بالكامل - تتبع دقيق للواتساب والاتصال والنموذج
  */
 
 (function () {
@@ -30,7 +30,6 @@
     window.dataLayer = window.dataLayer || [];
     window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
     
-    // إذا لم يكن كود قوقل محقوناً في الصفحة، نقوم بحقنه فوراً في الـ Head
     if (!document.querySelector(`script[src*="${GOOGLE_ADS_CONFIG.CONVERSION_ID}"]`)) {
       const script = document.createElement('script');
       script.async = true;
@@ -47,7 +46,7 @@
   autoInjectGoogleTag();
 
   // =========================================================================
-  // 3. دالة إرسال الإحالة لقوقل إعلانات
+  // 3. دالة إرسال الإحالة لقوقل إعلانات مع دعم الـ Beacon لسرعة الإرسال
   // =========================================================================
   function sendConversion(type) {
     try {
@@ -60,6 +59,7 @@
         'send_to': sendTo,
         'value': 1.0,
         'currency': 'SAR',
+        'transport_type': 'beacon', // يضمن الإرسال حتى لو غادر الزائر الصفحة للواتساب
         'event_callback': function () {
           console.log(`🎯 تم تسجيل إحالة ناجحة (${type}) في قوقل إعلانات:`, sendTo);
         }
@@ -72,11 +72,10 @@
   }
 
   // =========================================================================
-  // 4. نظام الرصد الشامل للنقرات في الموقع بالكامل (Global Event Delegation)
+  // 4. نظام الرصد الشامل للنقرات (مصحح لتفادي تداخل الواتساب والاتصال)
   // =========================================================================
   function initGlobalClickTracker() {
     document.addEventListener('click', function (event) {
-      // العثور على أقرب وسم رابط <a> تم النقر عليه
       const link = event.target.closest('a');
       if (!link) return;
 
@@ -84,17 +83,17 @@
 
       // 🛑 1. استثناء رقم المطور تماماً من أي تتبع
       if (href.includes(DEVELOPER_PHONE) || href.includes(DEVELOPER_PHONE_INTL)) {
-        return; // خروج فوري دون احتساب
+        return;
       }
 
-      // 📞 2. فحص نقرات الاتصال (سواء بالهيدر، الفوتر، الأزرار العائمة أو المحتوى)
-      if (href.startsWith('tel:') || href.includes(CLIENT_PHONE) || href.includes(CLIENT_PHONE_INTL)) {
-        sendConversion('CALL');
-      }
-
-      // 💬 3. فحص نقرات الواتساب الخاصة بالعميل فقط
-      else if (href.includes('wa.me') || href.includes('whatsapp.com') || href.includes('api.whatsapp.com')) {
+      // 💬 2. فحص نقرات الواتساب أولاً (هام جداً أن يكون قبل الاتصال)
+      if (href.includes('wa.me') || href.includes('whatsapp.com') || href.includes('api.whatsapp.com')) {
         sendConversion('WHATSAPP');
+      }
+
+      // 📞 3. فحص نقرات الاتصال الهاتفي فقط
+      else if (href.startsWith('tel:')) {
+        sendConversion('CALL');
       }
     }, true);
   }
@@ -208,7 +207,6 @@
   // 7. إدارة القائمة الجانبية للجوال والأسئلة الشائعة
   // =========================================================================
   function initUiComponents() {
-    // قائمة الجوال
     const menuToggle = document.getElementById('menuToggle');
     const mobileSidebar = document.getElementById('mobileSidebar');
     const sidebarClose = document.getElementById('sidebarClose');
@@ -232,7 +230,6 @@
       });
     }
 
-    // الأكورديون للأسئلة الشائعة
     const faqItems = document.querySelectorAll('.faq-item');
     faqItems.forEach(function (item) {
       const questionBtn = item.querySelector('.faq-question');
